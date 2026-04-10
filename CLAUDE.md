@@ -20,7 +20,7 @@ Requires `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` (Maps JavaScript API must be
 
 ## Architecture
 
-**Stack:** React 19, Vite 8, TypeScript 6, Tailwind CSS v4, shadcn/ui (base-nova style), Zustand, d3-geo, `@vis.gl/react-google-maps`.
+**Stack:** React 19, Vite 8, TypeScript 6, Tailwind CSS v4, shadcn/ui (base-nova style), `@vis.gl/react-google-maps`.
 
 **Path alias:** `@/` maps to `src/`.
 
@@ -28,7 +28,7 @@ Requires `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` (Maps JavaScript API must be
 
 1. `App.tsx` loads country data from `/countries.json` via `loadCountries()`, wraps everything in `<APIProvider>`.
 2. `SearchCard` provides search input + selected country list. On selection, calls `useMapStore.addCountry()`.
-3. `mapStore` (Zustand) is the single source of truth for placed countries, active selection, and country positions.
+3. `mapStore` (React Context + `useReducer`) is the single source of truth for placed countries, active selection, and country positions.
 4. `MapContainer` renders a Google `<Map>` with grayscale styling and maps `placedCountries` into `<CountryOverlay>` components.
 5. `CountryOverlay` imperatively creates `google.maps.Polygon` instances (not React-rendered) via `useEffect`. Handles click-to-activate and native Google Maps drag.
 
