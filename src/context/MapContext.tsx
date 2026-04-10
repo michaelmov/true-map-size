@@ -38,7 +38,7 @@ function mapReducer(state: MapState, action: MapAction): MapState {
 }
 
 interface MapContextValue extends MapState {
-  addCountry: (country: Country) => void;
+  addCountry: (country: Country, center?: [number, number]) => void;
   removeCountry: (id: string) => void;
   setActiveCountry: (id: string | null) => void;
   updateCountryCenter: (id: string, center: [number, number]) => void;
@@ -52,14 +52,14 @@ export function MapProvider({ children }: { children: ReactNode }) {
     activeCountryId: null,
   });
 
-  const addCountry = useCallback((country: Country) => {
+  const addCountry = useCallback((country: Country, center?: [number, number]) => {
     const id = `${country.code}-${Date.now()}`;
     const color = getNextColor();
     const placed: PlacedCountry = {
       id,
       country,
       color,
-      currentCenter: [...country.centroid],
+      currentCenter: center ? [...center] : [...country.centroid],
     };
     dispatch({ type: 'ADD_COUNTRY', placed });
   }, []);
