@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Toggle dark mode"
-      className="relative h-7 w-7 rounded-full hover:bg-accent transition-colors duration-200 flex items-center justify-center"
+      className="relative h-7 w-7 rounded-full hover:bg-accent transition-colors duration-200 flex items-center justify-center cursor-pointer"
     >
       <Sun
         className={`h-4 w-4 text-muted-foreground transition-all duration-300 absolute ${

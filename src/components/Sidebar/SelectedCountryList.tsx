@@ -18,10 +18,8 @@ export function SelectedCountryList() {
         {placedCountries.map((placed) => (
           <div
             key={placed.id}
-            className={`flex items-center justify-between rounded-md px-2 py-1.5 cursor-pointer transition-colors ${
-              placed.id === activeCountryId
-                ? 'bg-accent'
-                : 'hover:bg-accent/50'
+            className={`flex items-center justify-between rounded-md px-2 py-1.5 transition-colors ${
+              placed.id === activeCountryId ? 'bg-accent' : 'hover:bg-accent/50'
             }`}
             onClick={() => setActiveCountry(placed.id)}
           >
@@ -38,7 +36,7 @@ export function SelectedCountryList() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 shrink-0"
+              className="h-6 w-6 shrink-0 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 removeCountry(placed.id);
