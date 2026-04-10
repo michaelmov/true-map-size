@@ -1,6 +1,7 @@
 import { Map } from '@vis.gl/react-google-maps';
 import { CountryOverlay } from './CountryOverlay';
 import { useMapContext } from '@/context/MapContext';
+import { useThemeContext } from '@/context/ThemeContext';
 
 const GRAYSCALE_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ saturation: -100 }] },
@@ -9,6 +10,7 @@ const GRAYSCALE_STYLES: google.maps.MapTypeStyle[] = [
 export function MapContainer() {
   const placedCountries = useMapContext((s) => s.placedCountries);
   const activeCountryId = useMapContext((s) => s.activeCountryId);
+  const theme = useThemeContext((s) => s.theme);
 
   return (
     <Map
@@ -20,6 +22,7 @@ export function MapContainer() {
       streetViewControl={false}
       fullscreenControl={false}
       styles={GRAYSCALE_STYLES}
+      colorScheme={theme === 'dark' ? 'DARK' : 'LIGHT'}
       className="w-full h-full"
     >
       {placedCountries.map((placed) => (

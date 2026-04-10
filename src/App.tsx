@@ -4,6 +4,7 @@ import { MapContainer } from '@/components/Map/MapContainer';
 import { SearchCard } from '@/components/Sidebar/SearchCard';
 import { loadCountries } from '@/lib/countries';
 import { useMapContext, MapProvider } from '@/context/MapContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import type { Country } from '@/types';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
@@ -27,9 +28,11 @@ function AppContent() {
 function App() {
   return (
     <APIProvider apiKey={API_KEY}>
-      <MapProvider>
-        <AppContent />
-      </MapProvider>
+      <ThemeProvider>
+        <MapProvider>
+          <AppContent />
+        </MapProvider>
+      </ThemeProvider>
     </APIProvider>
   );
 }
