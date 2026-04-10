@@ -78,7 +78,7 @@ export function CountrySearch({ countries, onSelect }: CountrySearchProps) {
       {isOpen && results.length > 0 && (
         <ul
           role="listbox"
-          className="absolute top-full left-0 right-0 z-50 mt-1 max-h-64 overflow-auto rounded-md border bg-popover p-1 shadow-md"
+          className="absolute left-0 right-0 z-50 max-h-64 overflow-auto rounded-md border bg-popover p-1 shadow-md bottom-full mb-1 md:bottom-auto md:top-full md:mb-0 md:mt-1"
         >
           {results.map((country, index) => (
             <li

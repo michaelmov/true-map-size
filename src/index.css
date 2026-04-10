@@ -133,4 +133,7 @@
     width: 100vw;
     height: 100vh;
   }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
