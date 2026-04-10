@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react';
+import { useReducer, useCallback, type ReactNode } from 'react';
 import type { Country, PlacedCountry } from '@/types';
 import { getNextColor } from '@/lib/colors';
+import { MapContext } from './useMapContext';
 
 interface MapState {
   placedCountries: PlacedCountry[];
@@ -36,15 +37,6 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       };
   }
 }
-
-interface MapContextValue extends MapState {
-  addCountry: (country: Country, center?: [number, number]) => void;
-  removeCountry: (id: string) => void;
-  setActiveCountry: (id: string | null) => void;
-  updateCountryCenter: (id: string, center: [number, number]) => void;
-}
-
-const MapContext = createContext<MapContextValue | null>(null);
 
 export function MapProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(mapReducer, {
@@ -89,10 +81,4 @@ export function MapProvider({ children }: { children: ReactNode }) {
       {children}
     </MapContext.Provider>
   );
-}
-
-export function useMapContext<T>(selector: (state: MapContextValue) => T): T {
-  const context = useContext(MapContext);
-  if (!context) throw new Error('useMapContext must be used within MapProvider');
-  return selector(context);
 }

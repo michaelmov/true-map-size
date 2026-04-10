@@ -3,7 +3,8 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 import { MapContainer } from '@/components/Map/MapContainer';
 import { SearchCard } from '@/components/Sidebar/SearchCard';
 import { loadCountries } from '@/lib/countries';
-import { useMapContext, MapProvider } from '@/context/MapContext';
+import { MapProvider } from '@/context/MapContext';
+import { useMapContext } from '@/context/useMapContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import type { Country } from '@/types';
 

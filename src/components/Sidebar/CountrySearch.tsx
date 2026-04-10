@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { searchCountries, getFlagEmoji } from '@/lib/countries';
 import type { Country } from '@/types';
@@ -10,18 +10,19 @@ interface CountrySearchProps {
 
 export function CountrySearch({ countries, onSelect }: CountrySearchProps) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Country[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const matches = searchCountries(countries, query);
-    setResults(matches);
+  const results = useMemo(() => searchCountries(countries, query), [countries, query]);
+
+  function handleQueryChange(newQuery: string) {
+    setQuery(newQuery);
+    const matches = searchCountries(countries, newQuery);
     setIsOpen(matches.length > 0);
     setHighlightIndex(0);
-  }, [query, countries]);
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -66,7 +67,7 @@ export function CountrySearch({ countries, onSelect }: CountrySearchProps) {
         type="text"
         placeholder="Search for a country..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => handleQueryChange(e.target.value)}
         onFocus={() => results.length > 0 && setIsOpen(true)}
         onKeyDown={handleKeyDown}
         className="w-full"

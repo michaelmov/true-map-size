@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useCallback, useEffect, type ReactNode } from 'react';
+import { useReducer, useCallback, useEffect, type ReactNode } from 'react';
+import { ThemeContext } from './useThemeContext';
 
 type Theme = 'light' | 'dark';
 
@@ -25,12 +26,6 @@ function getInitialTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-interface ThemeContextValue extends ThemeState {
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(themeReducer, undefined, () => ({
     theme: getInitialTheme(),
@@ -55,10 +50,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useThemeContext<T>(selector: (state: ThemeContextValue) => T): T {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useThemeContext must be used within ThemeProvider');
-  return selector(context);
 }

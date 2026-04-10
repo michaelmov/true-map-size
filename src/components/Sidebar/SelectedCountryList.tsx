@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getFlagEmoji } from '@/lib/countries';
-import { useMapContext } from '@/context/MapContext';
+import { useMapContext } from '@/context/useMapContext';
 import { X } from 'lucide-react';
 
 export function SelectedCountryList() {

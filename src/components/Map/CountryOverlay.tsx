@@ -6,7 +6,7 @@ import {
   computeNewCenterFromDrag,
   type PrecomputedPaths,
 } from '@/lib/projection';
-import { useMapContext } from '@/context/MapContext';
+import { useMapContext } from '@/context/useMapContext';
 import type { PlacedCountry } from '@/types';
 
 interface CountryOverlayProps {
@@ -116,7 +116,6 @@ export const CountryOverlay = memo(function CountryOverlay({
       return;
     }
     updatePolygonFast(placed.currentCenter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placed.currentCenter]);
 
   // Update active styling without recreating the polygon

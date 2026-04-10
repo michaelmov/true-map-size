@@ -1,7 +1,7 @@
 import { Map } from '@vis.gl/react-google-maps';
 import { CountryOverlay } from './CountryOverlay';
-import { useMapContext } from '@/context/MapContext';
-import { useThemeContext } from '@/context/ThemeContext';
+import { useMapContext } from '@/context/useMapContext';
+import { useThemeContext } from '@/context/useThemeContext';
 
 const GRAYSCALE_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ saturation: -100 }] },

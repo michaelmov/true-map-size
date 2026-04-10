@@ -15,11 +15,13 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
   const [collapsed, setCollapsed] = useState(true);
   const [overflowVisible, setOverflowVisible] = useState(false);
 
+  const collapse = useCallback(() => {
+    setCollapsed(true);
+    setOverflowVisible(false);
+  }, []);
+
   useEffect(() => {
-    if (collapsed) {
-      setOverflowVisible(false);
-      return;
-    }
+    if (collapsed) return;
     const timer = setTimeout(() => setOverflowVisible(true), 300);
     return () => clearTimeout(timer);
   }, [collapsed]);
@@ -36,15 +38,15 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
     touchStartY.current = null;
     const SWIPE_THRESHOLD = 40;
     if (delta > SWIPE_THRESHOLD) setCollapsed(false);   // swipe up → expand
-    if (delta < -SWIPE_THRESHOLD) setCollapsed(true);   // swipe down → collapse
+    if (delta < -SWIPE_THRESHOLD) collapse();           // swipe down → collapse
   }
 
   const handleSelect = useCallback(
     (country: Country) => {
       onSelect(country);
-      setCollapsed(true);
+      collapse();
     },
-    [onSelect]
+    [onSelect, collapse]
   );
 
   return (
@@ -60,7 +62,7 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
       {/* Mobile drag handle */}
       <div
         className="flex justify-center pt-2 pb-0 md:hidden cursor-pointer"
-        onClick={() => setCollapsed((c) => !c)}
+        onClick={() => collapsed ? setCollapsed(false) : collapse()}
       >
         <div className="h-1 w-8 rounded-full bg-muted-foreground/30" />
       </div>
@@ -73,7 +75,7 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
-              onClick={() => setCollapsed((c) => !c)}
+              onClick={() => collapsed ? setCollapsed(false) : collapse()}
               aria-label={collapsed ? 'Expand search panel' : 'Collapse search panel'}
               className="h-7 w-7 rounded-full hover:bg-accent transition-colors duration-200 flex items-center justify-center cursor-pointer"
             >
