@@ -30,15 +30,15 @@ Requires `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` (Maps JavaScript API must be
 2. `SearchCard` provides search input + selected country list. On selection, calls `useMapStore.addCountry()`.
 3. `mapStore` (Zustand) is the single source of truth for placed countries, active selection, and country positions.
 4. `MapContainer` renders a Google `<Map>` with grayscale styling and maps `placedCountries` into `<CountryOverlay>` components.
-5. `CountryOverlay` imperatively creates `google.maps.Polygon` instances (not React-rendered) via `useEffect`. Handles click-to-activate and mousedown/mousemove/mouseup drag.
+5. `CountryOverlay` imperatively creates `google.maps.Polygon` instances (not React-rendered) via `useEffect`. Handles click-to-activate and native Google Maps drag.
 
 ### True-size projection (`src/lib/projection.ts`)
 
-The core math: to show a country at its true area when placed at a new latitude, each coordinate offset from the original centroid is scaled by `cos(originalLat) / cos(targetLat)`. This compensates for Mercator's `1/cos(lat)` distortion. The `reprojectCountry` function transforms GeoJSON coordinates; `geojsonToLatLngPaths` converts results to Google Maps `LatLngLiteral[][]`.
+Uses a spherical bearing + distance approach. For each vertex, `precomputeOffsets` stores the angular distance and heading from the country's centroid on the sphere. `applyOffsetsToPath` places each vertex by computing the spherical destination point from a given center. Combined with `geodesic: true` on the Google Maps Polygon, this gives correct Mercator distortion at all latitudes including the poles.
 
 ### Drag implementation
 
-Drag is handled by disabling the Google Map's own drag (`map.setOptions({ draggable: false })`) on polygon mousedown, tracking mouse delta on map `mousemove`, reprojecting in `requestAnimationFrame`, and committing the new center to the store on `mouseup`.
+Drag uses native Google Maps polygon dragging (`draggable: true, geodesic: true`). The `geodesic: true` flag makes the polygon visually resize in real-time as it crosses latitudes (zero JS per frame). On `dragend`, `computeNewCenterFromDrag` reverses the destination formula to find the new center from the moved vertex position, then `applyOffsetsToPath` snaps the paths to exact spherical positions.
 
 ### Country data
 
