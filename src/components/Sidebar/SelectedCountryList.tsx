@@ -18,9 +18,10 @@ export function SelectedCountryList() {
         {placedCountries.map((placed) => (
           <div
             key={placed.id}
-            className={`flex items-center justify-between rounded-md px-2 py-1.5 transition-colors ${
+            className={`flex items-center justify-between rounded-md px-2 py-1.5 border-2 border-transparent transition-colors cursor-pointer ${
               placed.id === activeCountryId ? 'bg-accent' : 'hover:bg-accent/50'
             }`}
+            style={placed.id === activeCountryId ? { borderColor: placed.color } : undefined}
             onClick={() => setActiveCountry(placed.id)}
           >
             <div className="flex items-center gap-2">

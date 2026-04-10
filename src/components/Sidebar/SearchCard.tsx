@@ -1,5 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { CountrySearch } from './CountrySearch';
 import { SelectedCountryList } from './SelectedCountryList';
 import { ThemeToggle } from './ThemeToggle';
@@ -37,8 +44,8 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
     const delta = touchStartY.current - e.changedTouches[0].clientY;
     touchStartY.current = null;
     const SWIPE_THRESHOLD = 40;
-    if (delta > SWIPE_THRESHOLD) setCollapsed(false);   // swipe up → expand
-    if (delta < -SWIPE_THRESHOLD) collapse();           // swipe down → collapse
+    if (delta > SWIPE_THRESHOLD) setCollapsed(false); // swipe up → expand
+    if (delta < -SWIPE_THRESHOLD) collapse(); // swipe down → collapse
   }
 
   const handleSelect = useCallback(
@@ -46,7 +53,7 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
       onSelect(country);
       collapse();
     },
-    [onSelect, collapse]
+    [onSelect, collapse],
   );
 
   return (
@@ -55,14 +62,14 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
       onTouchEnd={handleTouchEnd}
       className={`
         fixed bottom-0 left-0 right-0 z-10 rounded-t-xl rounded-b-none pb-safe
-        md:absolute md:bottom-auto md:left-8 md:top-8 md:right-auto md:w-72 md:rounded-xl md:pb-0
+        md:absolute md:bottom-auto md:left-8 md:top-8 md:right-auto md:w-105 md:rounded-xl md:pb-0
         overflow-visible backdrop-blur-md bg-card/90 shadow-lg transition-colors duration-300
       `}
     >
       {/* Mobile drag handle */}
       <div
         className="flex justify-center pt-2 pb-0 md:hidden cursor-pointer"
-        onClick={() => collapsed ? setCollapsed(false) : collapse()}
+        onClick={() => (collapsed ? setCollapsed(false) : collapse())}
       >
         <div className="h-1 w-8 rounded-full bg-muted-foreground/30" />
       </div>
@@ -75,8 +82,10 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
-              onClick={() => collapsed ? setCollapsed(false) : collapse()}
-              aria-label={collapsed ? 'Expand search panel' : 'Collapse search panel'}
+              onClick={() => (collapsed ? setCollapsed(false) : collapse())}
+              aria-label={
+                collapsed ? 'Expand search panel' : 'Collapse search panel'
+              }
               className="h-7 w-7 rounded-full hover:bg-accent transition-colors duration-200 flex items-center justify-center cursor-pointer"
             >
               <ChevronUp
@@ -94,9 +103,10 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
         className={`
           transition-[max-height,opacity] duration-300 ease-in-out
           md:!max-h-none md:!opacity-100 md:!overflow-visible
-          ${collapsed
-            ? 'max-h-0 opacity-0 overflow-hidden'
-            : `max-h-[500px] opacity-100 ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'}`
+          ${
+            collapsed
+              ? 'max-h-0 opacity-0 overflow-hidden'
+              : `max-h-[500px] opacity-100 ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'}`
           }
         `}
       >
