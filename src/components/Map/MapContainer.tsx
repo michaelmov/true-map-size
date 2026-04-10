@@ -4,7 +4,7 @@ import { useMapContext } from '@/context/useMapContext';
 import { useThemeContext } from '@/context/useThemeContext';
 
 const GRAYSCALE_STYLES: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ saturation: -100 }] },
+  { elementType: 'geometry', stylers: [{ saturation: -80 }] },
 ];
 
 export function MapContainer() {
