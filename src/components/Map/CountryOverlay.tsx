@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useMap } from '@vis.gl/react-google-maps';
 import {
   precomputeOffsets,
   applyOffsetsToPath,
+  computeNewCenterFromDrag,
   type PrecomputedPaths,
 } from '@/lib/projection';
 import { useMapStore } from '@/store/mapStore';
@@ -13,16 +14,17 @@ interface CountryOverlayProps {
   isActive: boolean;
 }
 
-export function CountryOverlay({ placed, isActive }: CountryOverlayProps) {
+export const CountryOverlay = memo(function CountryOverlay({
+  placed,
+  isActive,
+}: CountryOverlayProps) {
   const map = useMap();
   const polygonRef = useRef<google.maps.Polygon | null>(null);
-  const isDragging = useRef(false);
-  const lastMouse = useRef<{ lat: number; lng: number } | null>(null);
-  const dragCenter = useRef<[number, number]>([...placed.currentCenter]);
+  const precomputed = useRef<PrecomputedPaths | null>(null);
   const currentCenterRef = useRef<[number, number]>(placed.currentCenter);
   currentCenterRef.current = placed.currentCenter;
-  const rafId = useRef(0);
-  const precomputed = useRef<PrecomputedPaths | null>(null);
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
 
   const setActiveCountry = useMapStore((s) => s.setActiveCountry);
   const updateCountryCenter = useMapStore((s) => s.updateCountryCenter);
@@ -54,6 +56,8 @@ export function CountryOverlay({ placed, isActive }: CountryOverlayProps) {
       fillOpacity: 0.35,
       map,
       clickable: true,
+      draggable: true,
+      geodesic: true,
       zIndex: 1,
     });
 
@@ -64,58 +68,29 @@ export function CountryOverlay({ placed, isActive }: CountryOverlayProps) {
       setActiveCountry(placed.id);
     });
 
-    // Drag: mousedown on polygon
-    polygon.addListener('mousedown', (e: google.maps.MapMouseEvent) => {
-      if (!e.latLng) return;
-      isDragging.current = true;
-      lastMouse.current = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-      dragCenter.current = [...currentCenterRef.current];
-      map.setOptions({ draggable: false });
+    // Native drag — Google Maps handles movement at the WebGL level (zero JS per frame)
+    polygon.addListener('dragstart', () => {
       setActiveCountry(placed.id);
+      polygon.setOptions({ strokeWeight: 3 });
     });
 
-    // Drag: mousemove on map — deduplicated via rAF
-    const mouseMoveListener = map.addListener(
-      'mousemove',
-      (e: google.maps.MapMouseEvent) => {
-        if (!isDragging.current || !lastMouse.current || !e.latLng) return;
+    polygon.addListener('dragend', () => {
+      polygon.setOptions({ strokeWeight: isActiveRef.current ? 3 : 2 });
 
-        const dLat = e.latLng.lat() - lastMouse.current.lat;
-        const dLng = e.latLng.lng() - lastMouse.current.lng;
-        lastMouse.current = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+      // Compute new center from the drag delta
+      const newCenter = computeNewCenterFromDrag(
+        polygon,
+        precomputed.current!,
+        currentCenterRef.current
+      );
 
-        dragCenter.current = [
-          dragCenter.current[0] + dLng,
-          dragCenter.current[1] + dLat,
-        ];
-
-        // Cancel any pending frame to avoid stacking
-        cancelAnimationFrame(rafId.current);
-        const newCenter: [number, number] = [...dragCenter.current];
-        rafId.current = requestAnimationFrame(() => {
-          updatePolygonFast(newCenter);
-        });
-      }
-    );
-
-    const endDrag = () => {
-      if (!isDragging.current) return;
-      isDragging.current = false;
-      lastMouse.current = null;
-      cancelAnimationFrame(rafId.current);
-      map.setOptions({ draggable: true });
-      updateCountryCenter(placed.id, dragCenter.current);
-    };
-
-    const mouseUpListener = map.addListener('mouseup', endDrag);
-    window.addEventListener('mouseup', endDrag);
+      // Reproject with true-size cosine math and snap
+      updatePolygonFast(newCenter);
+      updateCountryCenter(placed.id, newCenter);
+    });
 
     return () => {
-      cancelAnimationFrame(rafId.current);
       polygon.setMap(null);
-      google.maps.event.removeListener(mouseMoveListener);
-      google.maps.event.removeListener(mouseUpListener);
-      window.removeEventListener('mouseup', endDrag);
       polygonRef.current = null;
       precomputed.current = null;
     };
@@ -124,9 +99,7 @@ export function CountryOverlay({ placed, isActive }: CountryOverlayProps) {
 
   // Update paths when currentCenter changes externally (from store)
   useEffect(() => {
-    if (!isDragging.current) {
-      updatePolygonFast(placed.currentCenter);
-    }
+    updatePolygonFast(placed.currentCenter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placed.currentCenter]);
 
@@ -141,4 +114,11 @@ export function CountryOverlay({ placed, isActive }: CountryOverlayProps) {
   }, [isActive]);
 
   return null;
-}
+},
+(prev, next) =>
+  prev.placed.id === next.placed.id &&
+  prev.placed.color === next.placed.color &&
+  prev.placed.currentCenter[0] === next.placed.currentCenter[0] &&
+  prev.placed.currentCenter[1] === next.placed.currentCenter[1] &&
+  prev.isActive === next.isActive
+);

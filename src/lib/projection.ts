@@ -139,6 +139,28 @@ export function precomputeOffsets(
 }
 
 /**
+ * Compute the new center after a native Google Maps drag.
+ * Native drag translates all vertices by the same lat/lng delta,
+ * so we compare one vertex's actual position with its expected position.
+ */
+export function computeNewCenterFromDrag(
+  polygon: google.maps.Polygon,
+  pre: PrecomputedPaths,
+  previousCenter: [number, number]
+): [number, number] {
+  const movedVertex = polygon.getPath().getAt(0);
+  const offset = pre.offsets[0][0];
+  const cosTarget = Math.cos(previousCenter[1] * (Math.PI / 180));
+  const latScale = cosTarget > 0.01 ? pre.cosOrig / cosTarget : pre.cosOrig / 0.01;
+  const expectedLng = previousCenter[0] + offset.dLng * latScale;
+  const expectedLat = previousCenter[1] + offset.dLat * latScale;
+  return [
+    previousCenter[0] + (movedVertex.lng() - expectedLng),
+    previousCenter[1] + (movedVertex.lat() - expectedLat),
+  ];
+}
+
+/**
  * Apply a new target center to pre-computed offsets, writing results
  * directly into the pre-allocated paths arrays. No allocations.
  */
