@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getFlagEmoji } from '@/lib/countries';
-import { useMapStore } from '@/store/mapStore';
+import { useMapContext } from '@/context/MapContext';
 import { X } from 'lucide-react';
 
 export function SelectedCountryList() {
-  const placedCountries = useMapStore((s) => s.placedCountries);
-  const activeCountryId = useMapStore((s) => s.activeCountryId);
-  const setActiveCountry = useMapStore((s) => s.setActiveCountry);
-  const removeCountry = useMapStore((s) => s.removeCountry);
+  const placedCountries = useMapContext((s) => s.placedCountries);
+  const activeCountryId = useMapContext((s) => s.activeCountryId);
+  const setActiveCountry = useMapContext((s) => s.setActiveCountry);
+  const removeCountry = useMapContext((s) => s.removeCountry);
 
   if (placedCountries.length === 0) return null;
 

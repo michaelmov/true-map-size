@@ -27,8 +27,8 @@ Requires `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` (Maps JavaScript API must be
 ### Key data flow
 
 1. `App.tsx` loads country data from `/countries.json` via `loadCountries()`, wraps everything in `<APIProvider>`.
-2. `SearchCard` provides search input + selected country list. On selection, calls `useMapStore.addCountry()`.
-3. `mapStore` (React Context + `useReducer`) is the single source of truth for placed countries, active selection, and country positions.
+2. `SearchCard` provides search input + selected country list. On selection, calls `useMapContext.addCountry()`.
+3. `MapContext` (`src/context/MapContext.tsx`, React Context + `useReducer`) is the single source of truth for placed countries, active selection, and country positions.
 4. `MapContainer` renders a Google `<Map>` with grayscale styling and maps `placedCountries` into `<CountryOverlay>` components.
 5. `CountryOverlay` imperatively creates `google.maps.Polygon` instances (not React-rendered) via `useEffect`. Handles click-to-activate and native Google Maps drag.
 

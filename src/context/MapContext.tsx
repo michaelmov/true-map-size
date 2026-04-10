@@ -91,8 +91,8 @@ export function MapProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useMapStore<T>(selector: (state: MapContextValue) => T): T {
+export function useMapContext<T>(selector: (state: MapContextValue) => T): T {
   const context = useContext(MapContext);
-  if (!context) throw new Error('useMapStore must be used within MapProvider');
+  if (!context) throw new Error('useMapContext must be used within MapProvider');
   return selector(context);
 }

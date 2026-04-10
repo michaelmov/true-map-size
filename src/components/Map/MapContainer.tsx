@@ -1,14 +1,14 @@
 import { Map } from '@vis.gl/react-google-maps';
 import { CountryOverlay } from './CountryOverlay';
-import { useMapStore } from '@/store/mapStore';
+import { useMapContext } from '@/context/MapContext';
 
 const GRAYSCALE_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ saturation: -100 }] },
 ];
 
 export function MapContainer() {
-  const placedCountries = useMapStore((s) => s.placedCountries);
-  const activeCountryId = useMapStore((s) => s.activeCountryId);
+  const placedCountries = useMapContext((s) => s.placedCountries);
+  const activeCountryId = useMapContext((s) => s.activeCountryId);
 
   return (
     <Map

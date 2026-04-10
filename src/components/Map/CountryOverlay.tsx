@@ -6,7 +6,7 @@ import {
   computeNewCenterFromDrag,
   type PrecomputedPaths,
 } from '@/lib/projection';
-import { useMapStore } from '@/store/mapStore';
+import { useMapContext } from '@/context/MapContext';
 import type { PlacedCountry } from '@/types';
 
 interface CountryOverlayProps {
@@ -30,8 +30,8 @@ export const CountryOverlay = memo(function CountryOverlay({
   const dragStartVertex = useRef<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
   const justDragged = useRef(false);
 
-  const setActiveCountry = useMapStore((s) => s.setActiveCountry);
-  const updateCountryCenter = useMapStore((s) => s.updateCountryCenter);
+  const setActiveCountry = useMapContext((s) => s.setActiveCountry);
+  const updateCountryCenter = useMapContext((s) => s.updateCountryCenter);
 
   // Apply target center using pre-computed spherical offsets
   function updatePolygonFast(center: [number, number]) {
