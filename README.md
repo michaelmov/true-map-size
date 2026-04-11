@@ -2,7 +2,7 @@
 
 **Live:** [true-map-size.vercel.app](https://true-map-size.vercel.app/)
 
-![True Size Map Preview](public/thumbnail-preview.png)
+![True Size Map Preview](public/og-thumbnail.png)
 
 A React app that visualizes the true geographic size of countries by overlaying them on an interactive map using react-leaflet with OpenStreetMap/CARTO tiles. Search for countries, place them on the map, and drag them across latitudes to see how Mercator distortion affects their apparent size. Multiple countries can be compared simultaneously.
 
