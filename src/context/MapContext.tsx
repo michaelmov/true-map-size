@@ -55,17 +55,25 @@ export function MapProvider({ children }: { children: ReactNode }) {
     panTarget: null,
   });
 
-  const addCountry = useCallback((country: Country, center?: [number, number]) => {
-    const id = `${country.code}-${Date.now()}`;
-    const color = getNextColor();
-    const placed: PlacedCountry = {
-      id,
-      country,
-      color,
-      currentCenter: center ? [...center] : [...country.centroid],
-    };
-    dispatch({ type: 'ADD_COUNTRY', placed });
-  }, []);
+  const addCountry = useCallback(
+    (country: Country, center?: [number, number]) => {
+      const existing = state.placedCountries.find((c) => c.country.code === country.code);
+      if (existing) {
+        dispatch({ type: 'PAN_TO', id: existing.id, center: existing.currentCenter });
+        return;
+      }
+      const id = `${country.code}-${Date.now()}`;
+      const color = getNextColor();
+      const placed: PlacedCountry = {
+        id,
+        country,
+        color,
+        currentCenter: center ? [...center] : [...country.centroid],
+      };
+      dispatch({ type: 'ADD_COUNTRY', placed });
+    },
+    [state.placedCountries]
+  );
 
   const removeCountry = useCallback((id: string) => {
     dispatch({ type: 'REMOVE_COUNTRY', id });
