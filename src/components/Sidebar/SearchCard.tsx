@@ -61,7 +61,7 @@ export function SearchCard({ countries, onSelect }: SearchCardProps) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className={`
-        fixed bottom-0 left-0 right-0 z-10 rounded-t-xl rounded-b-none pb-safe
+        fixed bottom-0 left-0 right-0 z-401 rounded-t-xl rounded-b-none pb-safe
         md:absolute md:bottom-auto md:left-8 md:top-8 md:right-auto md:w-105 md:rounded-xl md:pb-0
         overflow-visible backdrop-blur-md bg-card/90 shadow-lg transition-colors duration-300
       `}
