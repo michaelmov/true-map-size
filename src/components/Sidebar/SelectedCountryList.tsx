@@ -1,5 +1,5 @@
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { getFlagEmoji } from '@/lib/countries';
 import { useMapContext } from '@/context/useMapContext';
 import { X } from 'lucide-react';
@@ -10,14 +10,20 @@ export function SelectedCountryList() {
   const setActiveCountry = useMapContext((s) => s.setActiveCountry);
   const removeCountry = useMapContext((s) => s.removeCountry);
 
+  const activeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [activeCountryId]);
+
   if (placedCountries.length === 0) return null;
 
   return (
-    <ScrollArea className="max-h-60">
-      <div className="space-y-1 pt-2">
+    <div className="max-h-60 overflow-y-auto pt-2 space-y-1">
         {placedCountries.map((placed) => (
           <div
             key={placed.id}
+            ref={placed.id === activeCountryId ? activeRef : undefined}
             className={`flex items-center justify-between rounded-md px-2 py-1.5 border-2 border-transparent transition-colors cursor-pointer ${
               placed.id === activeCountryId ? 'bg-accent' : 'hover:bg-accent/50'
             }`}
@@ -48,7 +54,6 @@ export function SelectedCountryList() {
             </Button>
           </div>
         ))}
-      </div>
-    </ScrollArea>
+    </div>
   );
 }
