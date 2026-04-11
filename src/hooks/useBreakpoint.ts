@@ -13,22 +13,23 @@ const breakpoints = {
 };
 
 export function useBreakpoint(breakpoint: keyof typeof breakpoints) {
-  const [isMatch, setIsMatch] = useState(false);
+  const query = `(min-width: ${breakpoints[breakpoint]})`;
+  const [isMatch, setIsMatch] = useState(
+    () => window.matchMedia(query).matches,
+  );
 
   useEffect(() => {
-    const query = `(min-width: ${breakpoints[breakpoint]})`;
     const mediaQueryList = window.matchMedia(query);
 
-    // Set initial value
-    setIsMatch(mediaQueryList.matches);
-
-    const listener = (event: MediaQueryListEvent) => {
-      setIsMatch(event.matches);
+    const listener = () => {
+      setIsMatch(mediaQueryList.matches);
     };
 
     mediaQueryList.addEventListener('change', listener);
+    // Sync in case the value changed between initial render and effect
+    listener();
     return () => mediaQueryList.removeEventListener('change', listener);
-  }, [breakpoint]);
+  }, [query]);
 
   return isMatch;
 }
