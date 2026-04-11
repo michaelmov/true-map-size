@@ -137,6 +137,15 @@
   .leaflet-container {
     background: transparent !important;
   }
+
+  .leaflet-bar a {
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+
+  .leaflet-control-zoom-in {
+    border-bottom: 1px solid var(--border) !important;
+  }
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }

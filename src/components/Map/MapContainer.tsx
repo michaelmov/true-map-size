@@ -1,8 +1,13 @@
-import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
+import {
+  MapContainer as LeafletMapContainer,
+  TileLayer,
+  ZoomControl,
+} from 'react-leaflet';
 import { CountryOverlay } from './CountryOverlay';
 import { useMapContext } from '@/context/useMapContext';
 import { useThemeContext } from '@/context/useThemeContext';
 import { ExtendedCRS } from '@/lib/extendedCRS';
+import { useBreakpoint } from '@/hooks/useBreakpoint';
 
 const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -17,6 +22,8 @@ export function MapContainer() {
   const activeCountryId = useMapContext((s) => s.activeCountryId);
   const theme = useThemeContext((s) => s.theme);
 
+  const isMediumBreakpoint = useBreakpoint('md');
+
   return (
     <LeafletMapContainer
       center={[20, 0]}
@@ -24,14 +31,21 @@ export function MapContainer() {
       crs={ExtendedCRS}
       scrollWheelZoom={true}
       zoomControl={false}
+      maxZoom={6}
+      minZoom={2}
+      bounceAtZoomLimits
       className="w-full h-full"
     >
       <TileLayer
         key={theme}
         url={TILE_URLS[theme]}
         attribution={ATTRIBUTION}
-        bounds={[[-85.05, -180], [85.05, 180]]}
+        bounds={[
+          [-85.05, -180],
+          [85.05, 180],
+        ]}
       />
+      {isMediumBreakpoint && <ZoomControl position="bottomright" />}
       {placedCountries.map((placed) => (
         <CountryOverlay
           key={placed.id}
