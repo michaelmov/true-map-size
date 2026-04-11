@@ -46,6 +46,20 @@ export const CountryOverlay = memo(
     const dragStartLatLng = useRef<L.LatLng | null>(null);
     const dragStartCenter = useRef<[number, number]>([0, 0]);
 
+    /** Convert a native TouchEvent to a Leaflet LatLng. */
+    function touchEventToLatLng(
+      e: TouchEvent,
+      useChanged = false,
+    ): L.LatLng {
+      const touch = (useChanged ? e.changedTouches : e.touches)[0];
+      const rect = map.getContainer().getBoundingClientRect();
+      const point = L.point(
+        touch.clientX - rect.left,
+        touch.clientY - rect.top,
+      );
+      return map.containerPointToLatLng(point);
+    }
+
     const setActiveCountry = useMapContext((s) => s.setActiveCountry);
     const updateCountryCenter = useMapContext((s) => s.updateCountryCenter);
 
@@ -98,7 +112,67 @@ export const CountryOverlay = memo(
         map.dragging.disable();
       });
 
+      // Touch drag: attach directly to the polygon's SVG element
+      const el = polygon.getElement() as HTMLElement | undefined;
+      const container = map.getContainer();
+
+      const onTouchStart = (e: TouchEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        isDragging.current = true;
+        dragStartLatLng.current = touchEventToLatLng(e);
+        dragStartCenter.current = [...currentCenterRef.current];
+        setActiveCountry(placed.id);
+        polygon.setStyle({ weight: 3 });
+        map.dragging.disable();
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (!isDragging.current || !dragStartLatLng.current) return;
+        e.preventDefault();
+        const latlng = touchEventToLatLng(e);
+        const deltaLat = latlng.lat - dragStartLatLng.current.lat;
+        const deltaLng = latlng.lng - dragStartLatLng.current.lng;
+        const newCenter: [number, number] = [
+          dragStartCenter.current[0] + deltaLng,
+          dragStartCenter.current[1] + deltaLat,
+        ];
+        updatePolygonFast(newCenter);
+      };
+
+      const onTouchEnd = (e: TouchEvent) => {
+        if (!isDragging.current || !dragStartLatLng.current) return;
+        isDragging.current = false;
+        map.dragging.enable();
+
+        const latlng = touchEventToLatLng(e, true);
+        const deltaLat = latlng.lat - dragStartLatLng.current.lat;
+        const deltaLng = latlng.lng - dragStartLatLng.current.lng;
+        const newCenter: [number, number] = [
+          dragStartCenter.current[0] + deltaLng,
+          dragStartCenter.current[1] + deltaLat,
+        ];
+
+        polygonRef.current?.setStyle({
+          weight: isActiveRef.current ? 3 : 2,
+        });
+
+        updateCountryCenter(placed.id, newCenter);
+        dragStartLatLng.current = null;
+      };
+
+      if (el) {
+        el.addEventListener('touchstart', onTouchStart, { passive: false });
+      }
+      container.addEventListener('touchmove', onTouchMove, { passive: false });
+      container.addEventListener('touchend', onTouchEnd);
+
       return () => {
+        if (el) {
+          el.removeEventListener('touchstart', onTouchStart);
+        }
+        container.removeEventListener('touchmove', onTouchMove);
+        container.removeEventListener('touchend', onTouchEnd);
         polygon.remove();
         polygonRef.current = null;
         precomputed.current = null;
