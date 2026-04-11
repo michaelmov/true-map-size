@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { APIProvider } from '@vis.gl/react-google-maps';
 import { MapContainer } from '@/components/Map/MapContainer';
 import { SearchCard } from '@/components/Sidebar/SearchCard';
 import { loadCountries } from '@/lib/countries';
@@ -7,8 +6,6 @@ import { MapProvider } from '@/context/MapContext';
 import { useMapContext } from '@/context/useMapContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import type { Country } from '@/types';
-
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 
 const DEFAULT_COUNTRIES: { code: string; center: [number, number] }[] = [
   { code: 'US', center: [-20, 25] },
@@ -46,13 +43,11 @@ function AppContent() {
 
 function App() {
   return (
-    <APIProvider apiKey={API_KEY}>
-      <ThemeProvider>
-        <MapProvider>
-          <AppContent />
-        </MapProvider>
-      </ThemeProvider>
-    </APIProvider>
+    <ThemeProvider>
+      <MapProvider>
+        <AppContent />
+      </MapProvider>
+    </ThemeProvider>
   );
 }
 

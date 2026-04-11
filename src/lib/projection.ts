@@ -5,10 +5,11 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson';
 //
 // Each vertex is stored as {distance, heading} from the country's centroid.
 // To place the country at a new center, we compute the destination point
-// for each vertex using spherical math. Combined with geodesic: true on the
-// Google Maps Polygon, this gives correct Mercator distortion at all latitudes
-// — including the poles — with zero per-frame JS during drag.
+// for each vertex using spherical math. This gives correct Mercator distortion
+// at all latitudes — including the poles.
 // ---------------------------------------------------------------------------
+
+export interface LatLngLiteral { lat: number; lng: number }
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
@@ -75,7 +76,7 @@ export interface PrecomputedPaths {
   /** Per-ring, per-vertex: angular distance (rad) and heading (rad) from centroid */
   offsets: { distance: number; heading: number }[][];
   /** Pre-allocated LatLngLiteral arrays reused across calls */
-  paths: google.maps.LatLngLiteral[][];
+  paths: LatLngLiteral[][];
 }
 
 /**
@@ -89,7 +90,7 @@ export function precomputeOffsets(
   const [origLng, origLat] = originalCentroid;
 
   const offsets: { distance: number; heading: number }[][] = [];
-  const paths: google.maps.LatLngLiteral[][] = [];
+  const paths: LatLngLiteral[][] = [];
 
   const rings: Position[][] =
     geojson.geometry.type === 'Polygon'
@@ -98,7 +99,7 @@ export function precomputeOffsets(
 
   for (const ring of rings) {
     const ringOffsets: { distance: number; heading: number }[] = new Array(ring.length);
-    const ringPath: google.maps.LatLngLiteral[] = new Array(ring.length);
+    const ringPath: LatLngLiteral[] = new Array(ring.length);
     for (let i = 0; i < ring.length; i++) {
       const [vLng, vLat] = ring[i];
       ringOffsets[i] = {
@@ -121,7 +122,7 @@ export function precomputeOffsets(
 export function applyOffsetsToPath(
   pre: PrecomputedPaths,
   targetCenter: [number, number]
-): google.maps.LatLngLiteral[][] {
+): LatLngLiteral[][] {
   const [targetLng, targetLat] = targetCenter;
 
   for (let r = 0; r < pre.offsets.length; r++) {
