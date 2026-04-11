@@ -16,7 +16,7 @@ const TILE_URLS = {
 } as const;
 
 const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 export function MapContainer() {
   const placedCountries = useMapContext((s) => s.placedCountries);
